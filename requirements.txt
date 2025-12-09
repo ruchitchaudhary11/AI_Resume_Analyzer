@@ -14,4 +14,7 @@ torch==2.5.1+cpu
 streamlit-option-menu
 streamlit-extras
 langchain-community
-sentence-transformers
+sentence-transformers>=2.6.0
+transformers>=4.41.0
+langchain-huggingface>=0.1.0
+torch>=2.2.0
