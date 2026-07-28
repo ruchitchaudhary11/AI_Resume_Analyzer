@@ -132,6 +132,14 @@ if uploaded_file is not None:
                         resume_text
                     )
 
+                elif analysis_option == "Interview Questions":
+                
+                    result = analyze_interview(
+                        groq_api_key,
+                        vector_db,
+                        resume_text
+                    )
+
                 elif analysis_option == "Resume Weakness":
 
                     result = analyze_weakness(
