@@ -172,16 +172,21 @@ if uploaded_file is not None:
                                     job_title_input,
                                     job_location
                                 )
+                                # st.write("Job Title Input:", job_title_input)
+                                # st.write("Generated URL:", link)
 
                                 linkedin_scraper.link_open_scrolldown(
                                     driver,
                                     link,
                                     job_count
                                 )
+                                # st.write("Current URL:", driver.current_url)
+                                # st.write("Page Title:", driver.title)
                                 df=linkedin_scraper.scrap_company_data(
                                     driver,
                                     job_title_input,
-                                    job_location
+                                    job_location,
+                                    job_count
                                 )
 
                                 if len(df)>0:

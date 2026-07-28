@@ -59,23 +59,27 @@ class linkedin_scraper:
 
     @staticmethod
     def build_url(job_title, job_location):
+        keyword = "%20".join(job_title[0].split())
 
-        b = []
-        for i in job_title:
-            x = i.split()
-            y = '%20'.join(x)
-            b.append(y)
+        
+        
 
-        job_title = '%2C%20'.join(b)
-        link = f"https://in.linkedin.com/jobs/search?keywords={job_title}&location={job_location}&locationId=&geoId=102713980&f_TPR=r604800&position=1&pageNum=0"
-
-        return link
+        return (
+            f"https://www.linkedin.com/jobs/search/"
+            f"?keywords={keyword}"
+            f"&location={job_location}"
+        )
     
     @staticmethod
     def open_link(driver, link):
+        driver.get("https://www.linkedin.com/feed/")
+        time.sleep(2)
 
         driver.get(link)
         time.sleep(5)
+
+        driver.refresh()
+        time.sleep(3)
 
     @staticmethod
     def link_open_scrolldown(driver, link, job_count):
@@ -126,14 +130,14 @@ class linkedin_scraper:
             return np.nan
 
     @staticmethod
-    def scrap_company_data(driver, job_title_input, job_location):
+    def scrap_company_data(driver, job_title_input, job_location,job_count):
         cards=driver.find_elements(
             By.CSS_SELECTOR,
             "li.scaffold-layout__list-item"
         )
         data=[]
 
-        for card in cards:
+        for card in cards[:job_count]:
             try:
 
                 title=card.find_element(
@@ -170,15 +174,16 @@ class linkedin_scraper:
         if len(df)==0:
             return df
 
-        df["Job Title"] = df["Job Title"].apply(
-            lambda x: linkedin_scraper.job_title_filter(x,job_title_input)
-        )
+        # df["Job Title"] = df["Job Title"].apply(
+        #     lambda x: linkedin_scraper.job_title_filter(x,job_title_input)
+        # )
 
-        df["Location"]=df["Location"].apply(
-            lambda x: x if job_location.lower() in x.lower() else np.nan
-        )
+        # df["Location"]=df["Location"].apply(
+        #     lambda x: x if job_location.lower() in x.lower() else np.nan
+        # )
 
-        df.dropna(inplace=True)
+        # df.dropna(inplace=True)
+        print(df)
         df.reset_index(drop=True, inplace=True)
         return df
         
@@ -239,40 +244,40 @@ class linkedin_scraper:
                 st.write(f"Location     : {df_final.iloc[i,2]}")
                 st.write(f"Website URL  : {df_final.iloc[i,3]}")
 
-                with st.expander(label='Job Desription'):
-                    st.write(df_final.iloc[i, 4])
+                # with st.expander(label='Job Desription'):
+                #     st.write(df_final.iloc[i, 4])
                 add_vertical_space(3)
         
         else:
             st.markdown(f'<h5 style="text-align: center;color: orange;">No Matching Jobs Found</h5>', 
                                 unsafe_allow_html=True)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    driver = linkedin_scraper.webdriver_setup()
+#     driver = linkedin_scraper.webdriver_setup()
 
-    driver.get("https://www.linkedin.com/jobs/search/?keywords=Data%20Analyst&location=India")
+#     driver.get("https://www.linkedin.com/jobs/search/?keywords=Data%20Analyst&location=India")
 
-    time.sleep(8)
+#     time.sleep(8)
 
-    df = linkedin_scraper.scrap_company_data(
-        driver,
-        ["Data Analyst"],
-        "India"
-    )
+#     df = linkedin_scraper.scrap_company_data(
+#         driver,
+#         ["Data Analyst"],
+#         "India"
+#     )
 
-    print(df)
+#     print(df)
 
-    print("\nFetching Job Descriptions...\n")
+#     print("\nFetching Job Descriptions...\n")
 
-    df = linkedin_scraper.scrap_job_description(
-        driver,
-        df,
-        3          # sirf first 3 jobs test ke liye
-    )
+#     df = linkedin_scraper.scrap_job_description(
+#         driver,
+#         df,
+#         3          # sirf first 3 jobs test ke liye
+#     )
 
-    print(df[["Company Name", "Job Description"]])
+#     print(df[["Company Name", "Job Description"]])
 
-    input("Press Enter...")
+#     input("Press Enter...")
 
-    driver.quit()
+#     driver.quit()
