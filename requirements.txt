@@ -10,7 +10,7 @@ transformers
 sentence-transformers
 
 faiss-cpu
-
+streamlit-extras
 pypdf
 python-dotenv
 
