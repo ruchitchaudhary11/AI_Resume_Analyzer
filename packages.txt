@@ -1,2 +1,5 @@
+build-essential
+gfortran
+pkg-config
 chromium
 chromium-driver
