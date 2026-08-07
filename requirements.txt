@@ -5,9 +5,9 @@ langchain-community==0.2.19
 langchain-groq==0.1.10
 langchain-huggingface==0.0.3
 
-huggingface-hub>=0.24.0
+huggingface-hub==0.24.7
 transformers==4.41.2
-sentence-transformers==3.0.1
+sentence-transformers==2.7.0
 
 faiss-cpu==1.12.0
 
@@ -17,11 +17,11 @@ python-dotenv==1.0.1
 selenium==4.23.1
 webdriver-manager==4.0.2
 
-torch
+torch==2.3.1
 
-numpy
-pandas
-scikit-learn
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
 
 requests==2.32.3
 beautifulsoup4==4.12.3
