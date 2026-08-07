@@ -19,11 +19,10 @@ webdriver-manager==4.0.2
 
 torch
 
-numpy>=1.26
-pandas>=2.2
-scikit-learn==1.5.1
+numpy
+pandas
+scikit-learn
 
 requests==2.32.3
 beautifulsoup4==4.12.3
-lxml==5.2.2
 toml==0.10.2
