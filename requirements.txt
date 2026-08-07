@@ -6,8 +6,8 @@ langchain-groq==0.1.10
 langchain-huggingface==0.0.3
 
 huggingface-hub>=0.24.0
-sentence-transformers>=3.0.1
 transformers==4.41.2
+sentence-transformers==3.0.1
 
 faiss-cpu==1.12.0
 
