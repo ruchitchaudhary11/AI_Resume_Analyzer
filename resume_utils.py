@@ -86,7 +86,7 @@ def groq_llm(groq_api_key, vector_db, analyze):
 
         groq_api_key=groq_api_key,
 
-        model_name="llama-3.1-8b-instant",
+        model_name="openai/gpt-oss-20b",
 
         temperature=0
 
