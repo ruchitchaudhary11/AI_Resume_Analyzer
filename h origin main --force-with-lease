@@ -1,0 +1,44 @@
+33aa85a Ruchit Chaudhary <YOUR_EMAIL> update gitignore
+1237d2a Ruchit Chaudhary <YOUR_EMAIL> Update Groq model configuration
+ec7aa26 Ruchit Chaudhary <YOUR_EMAIL> modified app.py
+d99d478 Ruchit Chaudhary <YOUR_EMAIL> Update README with project details and features
+1aa0c1d Ruchit Chaudhary <YOUR_EMAIL> Revise README with comprehensive project overview
+63e3d11 Ruchit Chaudhary <YOUR_EMAIL> Revise README for improved clarity and structure
+af91412 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+c528206 Ruchit Chaudhary <YOUR_EMAIL> Add chromium-driver to packages list
+4055f8f Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+fb114e7 Ruchit Chaudhary <YOUR_EMAIL> Update numpy version in requirements.txt
+8b59f99 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+aa324e4 Ruchit Chaudhary <YOUR_EMAIL> Update package versions in requirements.txt
+edb86ee Ruchit Chaudhary <YOUR_EMAIL> Reorganize dependencies in requirements.txt
+c800baa Ruchit Chaudhary <YOUR_EMAIL> Fix newline at end of runtime.txt
+6e87d7d Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt to remove version constraints
+c603245 Ruchit Chaudhary <YOUR_EMAIL> Add Python version to runtime.txt
+37e1393 Ruchit Chaudhary <YOUR_EMAIL> Update package versions in requirements.txt
+4d59c3c Ruchit Chaudhary <YOUR_EMAIL> Update faiss-cpu version in requirements.txt
+3a9870b Ruchit Chaudhary <YOUR_EMAIL> Modify requirements.txt to update and add packages
+a5c6408 Ruchit Chaudhary <YOUR_EMAIL> Added LinkedIn job scraper improvements
+aaf87fc Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+203fdce Ruchit Chaudhary <YOUR_EMAIL> Initial commit
+842330c Ruchit Chaudhary <YOUR_EMAIL> first commit
+6bc55ff Ruchit Chaudhary <YOUR_EMAIL> Update dependencies in requirements.txt
+3f57dc5 Ruchit Chaudhary <YOUR_EMAIL> Update app.py
+5dbdbc8 Ruchit Chaudhary <YOUR_EMAIL> Update app.py
+555b246 Ruchit Chaudhary <YOUR_EMAIL> Delete KunalPuniaResume.pdf
+57b7710 Ruchit Chaudhary <YOUR_EMAIL> Update README.md
+aff0a0d Ruchit Chaudhary <YOUR_EMAIL> Update README.md
+9dac33d Ruchit Chaudhary <YOUR_EMAIL> Create README.md
+d823dcd Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+f0458dc Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+3133668 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+abb75e8 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+fb60232 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+f7e6c20 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+85ed61e Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+bec5bea Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+ad948d2 Ruchit Chaudhary <YOUR_EMAIL> Update requirements.txt
+da83832 Ruchit Chaudhary <YOUR_EMAIL> Update app.py
+1d4c744 Ruchit Chaudhary <YOUR_EMAIL> Update packages.txt
+4f33ca6 Ruchit Chaudhary <YOUR_EMAIL> Add .gitignore to exclude large and temp files
+457bf07 Ruchit Chaudhary <YOUR_EMAIL> Add .gitignore to ignore venv and sensitive files
+c16672d Ruchit Chaudhary <YOUR_EMAIL> Initial commit

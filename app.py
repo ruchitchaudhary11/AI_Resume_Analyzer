@@ -1,11 +1,11 @@
 import streamlit as st
-from pypdf import PdfReader
+
 from linkedin_scraper import linkedin_scraper
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
 
 from resume_utils import (
+    extract_text,
+    create_chunks,
+    create_vector_db,
     analyze_summary,
     analyze_strength,
     analyze_weakness,
@@ -14,9 +14,10 @@ from resume_utils import (
     analyze_interview
 )
 
-# ---------------------------
-# Page Config
-# ---------------------------
+
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 
 st.set_page_config(
     page_title="AI Resume Analyzer",
@@ -26,12 +27,19 @@ st.set_page_config(
 
 st.title("📄 AI Powered Resume Analyzer")
 st.write("Upload your resume and analyze it using AI.")
+
+
+# =========================================================
+# SESSION STATE
+# =========================================================
+
 if "analyzed" not in st.session_state:
     st.session_state.analyzed = False
 
-# ---------------------------
-# Sidebar
-# ---------------------------
+
+# =========================================================
+# SIDEBAR
+# =========================================================
 
 groq_api_key = st.sidebar.text_input(
     "Groq API Key",
@@ -49,170 +57,245 @@ analysis_option = st.sidebar.selectbox(
         "Interview Questions"
     ]
 )
-    
 
-# ---------------------------
-# Upload Resume
-# ---------------------------
+
+# =========================================================
+# UPLOAD RESUME
+# =========================================================
 
 uploaded_file = st.file_uploader(
     "Upload Resume (PDF)",
     type="pdf"
 )
 
-# ---------------------------
-# Process Resume
-# ---------------------------
+
+# =========================================================
+# PROCESS RESUME
+# =========================================================
 
 if uploaded_file is not None:
 
-    reader = PdfReader(uploaded_file)
+    # Extract resume text
+    resume_text = extract_text(uploaded_file)
 
-    resume_text = ""
+    if not resume_text.strip():
 
-    for page in reader.pages:
-
-        page_text = page.extract_text()
-
-        if page_text:
-
-            resume_text += page_text
-
-    st.success("Resume Uploaded Successfully!")
-
-    with st.spinner("Creating Embeddings..."):
-
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=100
+        st.error(
+            "Could not extract text from this PDF. "
+            "Please upload a text-based PDF."
         )
 
-        chunks = splitter.split_text(resume_text)
+    else:
 
-        embedding_model = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
+        st.success("Resume Uploaded Successfully!")
 
-        vector_db = FAISS.from_texts(
-            chunks,
-            embedding_model
-        )
+        # -------------------------------------------------
+        # Create Vector Database
+        # -------------------------------------------------
 
-    st.success("Knowledge Base Ready!")
+        with st.spinner("Creating Resume Knowledge Base..."):
 
-    # -----------------------
-    # Analyze Button
-    # -----------------------
+            chunks = create_chunks(resume_text)
 
-    if st.button("Analyze Resume"):
-        st.session_state.analyzed=True
-    if st.session_state.analyzed:
+            vector_db = create_vector_db(chunks)
 
-        if groq_api_key == "":
+        st.success("Knowledge Base Ready!")
 
-            st.error("Please Enter Groq API Key")
+        # -------------------------------------------------
+        # Analyze Button
+        # -------------------------------------------------
 
-        else:
+        if st.button("Analyze Resume"):
 
-            with st.spinner("Analyzing..."):
+            st.session_state.analyzed = True
 
-                if analysis_option == "Resume Summary":
+        # -------------------------------------------------
+        # Run Analysis
+        # -------------------------------------------------
 
-                    result = analyze_summary(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
+        if st.session_state.analyzed:
 
-                elif analysis_option == "Resume Strength":
+            if not groq_api_key.strip():
 
-                    result = analyze_strength(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
+                st.error("Please Enter Groq API Key")
 
-                elif analysis_option == "Interview Questions":
-                
-                    result = analyze_interview(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
+            else:
 
-                elif analysis_option == "Resume Weakness":
+                # =================================================
+                # RESUME ANALYSIS
+                # =================================================
 
-                    result = analyze_weakness(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
-                elif analysis_option == "ATS Score":
-                    
-                    result = analyze_ats(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
+                if analysis_option != "Recommended Jobs":
 
-                elif analysis_option == "Recommended Jobs":
+                    with st.spinner("Analyzing Resume..."):
 
-                    result = analyze_jobs(
-                        groq_api_key,
-                        vector_db,
-                        resume_text
-                    )
+                        if analysis_option == "Resume Summary":
+
+                            result = analyze_summary(
+                                groq_api_key,
+                                vector_db,
+                                resume_text
+                            )
+
+                        elif analysis_option == "Resume Strength":
+
+                            result = analyze_strength(
+                                groq_api_key,
+                                vector_db,
+                                resume_text
+                            )
+
+                        elif analysis_option == "Resume Weakness":
+
+                            result = analyze_weakness(
+                                groq_api_key,
+                                vector_db,
+                                resume_text
+                            )
+
+                        elif analysis_option == "ATS Score":
+
+                            result = analyze_ats(
+                                groq_api_key,
+                                vector_db,
+                                resume_text
+                            )
+
+                        elif analysis_option == "Interview Questions":
+
+                            result = analyze_interview(
+                                groq_api_key,
+                                vector_db,
+                                resume_text
+                            )
+
+                    st.markdown("---")
+                    st.subheader("Result")
+                    st.write(result)
+
+
+                # =================================================
+                # RECOMMENDED JOBS
+                # =================================================
+
+                else:
+
+                    with st.spinner("Analyzing suitable job roles..."):
+
+                        result = analyze_jobs(
+                            groq_api_key,
+                            vector_db,
+                            resume_text
+                        )
 
                     st.subheader("Recommended Jobs")
                     st.write(result)
+
                     st.markdown("---")
 
-                    #user input
-                    job_title_input,job_location,job_count,submit=linkedin_scraper.get_userinput()
+                    # =================================================
+                    # LINKEDIN JOB SEARCH
+                    # =================================================
+
+                    st.subheader("🔎 Search LinkedIn Jobs")
+
+                    (
+                        job_title_input,
+                        job_location,
+                        job_count,
+                        submit
+                    ) = linkedin_scraper.get_userinput()
+
                     if submit:
-                        with st.spinner("Searching jobs.."):
-                            driver=None
+
+                        driver = None
+
+                        with st.spinner("Searching jobs..."):
 
                             try:
-                                driver=linkedin_scraper.webdriver_setup()
 
-                                link=linkedin_scraper.build_url(
+                                # -----------------------------------------
+                                # Start Chrome
+                                # -----------------------------------------
+
+                                driver = linkedin_scraper.webdriver_setup()
+
+                                # -----------------------------------------
+                                # Build LinkedIn URL
+                                # -----------------------------------------
+
+                                link = linkedin_scraper.build_url(
                                     job_title_input,
                                     job_location
                                 )
-                                # st.write("Job Title Input:", job_title_input)
-                                # st.write("Generated URL:", link)
+
+                                # Useful debugging information
+                                st.info(
+                                    f"Searching for: "
+                                    f"{', '.join(job_title_input)} "
+                                    f"in {job_location}"
+                                )
+
+                                # -----------------------------------------
+                                # Open LinkedIn Jobs
+                                # -----------------------------------------
 
                                 linkedin_scraper.link_open_scrolldown(
                                     driver,
                                     link,
                                     job_count
                                 )
-                                # st.write("Current URL:", driver.current_url)
-                                # st.write("Page Title:", driver.title)
-                                df=linkedin_scraper.scrap_company_data(
+
+                                # -----------------------------------------
+                                # Scrape Job Cards
+                                # -----------------------------------------
+
+                                df = linkedin_scraper.scrap_company_data(
                                     driver,
                                     job_title_input,
                                     job_location,
                                     job_count
                                 )
 
-                                if len(df)>0:
-                                    linkedin_scraper.display_data_userinterface(df)
+                                # -----------------------------------------
+                                # Display Result
+                                # -----------------------------------------
+
+                                if df is not None and not df.empty:
+
+                                    st.success(
+                                        f"Found {len(df)} matching jobs."
+                                    )
+
+                                    linkedin_scraper.display_data_userinterface(
+                                        df
+                                    )
+
                                 else:
-                                    st.warning("No matching jobs found.")
-                                
+
+                                    st.warning(
+                                        "No matching jobs found."
+                                    )
+
+                                    # Debug information
+                                    st.write(
+                                        "**Current URL:**",
+                                        driver.current_url
+                                    )
+
+                                    st.write(
+                                        "**Page Title:**",
+                                        driver.title
+                                    )
+
                             except Exception as e:
-                                st.error(f"Error:{e}")
+
+                                st.error(
+                                    f"LinkedIn scraping error: {str(e)}"
+                                )
 
                             finally:
-                                if driver:
+
+                                if driver is not None:
+
                                     driver.quit()
-                            
-
-                if analysis_option!="Recommended Jobs":
-                    st.markdown("---")
-                    st.subheader("Result")
-                    st.write(result)
-
-                   
