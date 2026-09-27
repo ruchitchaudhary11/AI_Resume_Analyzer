@@ -25,3 +25,6 @@ webdriver-manager
 requests
 beautifulsoup4
 toml
+
+torch
+torchvision
