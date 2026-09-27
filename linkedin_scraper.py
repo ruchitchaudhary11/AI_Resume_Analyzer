@@ -30,7 +30,7 @@ class linkedin_scraper:
         options.add_argument("--disable-infobars")
         options.add_argument("--disable-notifications")
 
-        # Selenium Manager automatically finds the Chrome driver
+        # Selenium Manager automatically finds Chrome driver
         driver = webdriver.Chrome(
             options=options
         )
@@ -38,7 +38,6 @@ class linkedin_scraper:
         driver.implicitly_wait(5)
 
         return driver
-
 
     # ============================================================
     # USER INPUT
@@ -69,7 +68,6 @@ class linkedin_scraper:
                     placeholder="e.g. Java Developer"
                 )
 
-                # Convert comma-separated input into list
                 job_title_input = [
                     x.strip()
                     for x in job_title_input.split(",")
@@ -115,17 +113,12 @@ class linkedin_scraper:
             submit
         )
 
-
     # ============================================================
     # BUILD LINKEDIN SEARCH URL
     # ============================================================
 
     @staticmethod
     def build_url(job_title, job_location):
-
-        # --------------------------------------------------------
-        # Convert job titles into LinkedIn search format
-        # --------------------------------------------------------
 
         encoded_titles = []
 
@@ -159,7 +152,6 @@ class linkedin_scraper:
 
         return link
 
-
     # ============================================================
     # OPEN LINK
     # ============================================================
@@ -182,7 +174,6 @@ class linkedin_scraper:
             )
 
             return False
-
 
     # ============================================================
     # OPEN SEARCH PAGE + LOAD JOBS
@@ -207,16 +198,14 @@ class linkedin_scraper:
         if not success:
             return
 
-
         # --------------------------------------------------------
         # Give page time to load
         # --------------------------------------------------------
 
         time.sleep(3)
 
-
         # --------------------------------------------------------
-        # Display basic debugging information
+        # Display debugging information
         # --------------------------------------------------------
 
         st.write(
@@ -229,12 +218,8 @@ class linkedin_scraper:
             driver.title
         )
 
-
         # --------------------------------------------------------
-        # Scroll multiple times
-        #
-        # We don't use job_count directly here because job_count
-        # means number of jobs wanted, not number of scrolls.
+        # Scroll page
         # --------------------------------------------------------
 
         scroll_count = max(
@@ -253,8 +238,8 @@ class linkedin_scraper:
                 time.sleep(1.5)
 
             except Exception:
-                pass
 
+                pass
 
         # --------------------------------------------------------
         # Try "See more jobs"
@@ -289,7 +274,6 @@ class linkedin_scraper:
 
                 break
 
-
         # --------------------------------------------------------
         # Final scroll
         # --------------------------------------------------------
@@ -303,8 +287,8 @@ class linkedin_scraper:
             time.sleep(2)
 
         except Exception:
-            pass
 
+            pass
 
     # ============================================================
     # JOB TITLE FILTER
@@ -336,14 +320,12 @@ class linkedin_scraper:
             if not user_title:
                 continue
 
-
             # ----------------------------------------------------
             # Exact phrase match
             # ----------------------------------------------------
 
             if user_title in scraped_title:
                 return True
-
 
             # ----------------------------------------------------
             # Word-based match
@@ -357,9 +339,7 @@ class linkedin_scraper:
             ):
                 return True
 
-
         return False
-
 
     # ============================================================
     # LOCATION FILTER
@@ -389,9 +369,8 @@ class linkedin_scraper:
             .strip()
         )
 
-
         # --------------------------------------------------------
-        # If user searches India, accept Indian locations
+        # If user searches India
         # --------------------------------------------------------
 
         if requested_location == "india":
@@ -404,7 +383,6 @@ class linkedin_scraper:
                 "hybrid" in scraped_location
             )
 
-
         # --------------------------------------------------------
         # Normal matching
         # --------------------------------------------------------
@@ -412,10 +390,8 @@ class linkedin_scraper:
         if requested_location in scraped_location:
             return True
 
-
         if scraped_location in requested_location:
             return True
-
 
         # --------------------------------------------------------
         # Match individual location words
@@ -430,7 +406,6 @@ class linkedin_scraper:
 
         return matched_words > 0
 
-
     # ============================================================
     # SCRAPE JOB DATA
     # ============================================================
@@ -439,11 +414,11 @@ class linkedin_scraper:
     def scrap_company_data(
         driver,
         job_title_input,
-        job_location
+        job_location,
+        job_count
     ):
 
         jobs = []
-
 
         # ========================================================
         # FIND JOB CARDS
@@ -453,7 +428,6 @@ class linkedin_scraper:
             By.CSS_SELECTOR,
             "ul.jobs-search__results-list li"
         )
-
 
         # --------------------------------------------------------
         # Fallback selector
@@ -466,7 +440,6 @@ class linkedin_scraper:
                 ".jobs-search__results-list li"
             )
 
-
         # --------------------------------------------------------
         # Another fallback
         # --------------------------------------------------------
@@ -478,12 +451,10 @@ class linkedin_scraper:
                 "li.base-card"
             )
 
-
         st.write(
             "Job cards found:",
             len(cards)
         )
-
 
         # ========================================================
         # IF NO CARDS FOUND
@@ -509,12 +480,15 @@ class linkedin_scraper:
                 ]
             )
 
-
         # ========================================================
         # PROCESS EACH JOB CARD
         # ========================================================
 
         for card in cards:
+
+            # Stop after requested number of matching jobs
+            if len(jobs) >= int(job_count):
+                break
 
             try:
 
@@ -525,16 +499,11 @@ class linkedin_scraper:
                 title = ""
 
                 title_selectors = [
-
                     ".base-search-card__title",
-
                     "h3.base-search-card__title",
-
                     "h3",
-
                     "a[href*='/jobs/view/']"
                 ]
-
 
                 for selector in title_selectors:
 
@@ -551,8 +520,8 @@ class linkedin_scraper:
                             break
 
                     except Exception:
-                        continue
 
+                        continue
 
                 # ------------------------------------------------
                 # COMPANY
@@ -561,14 +530,10 @@ class linkedin_scraper:
                 company = ""
 
                 company_selectors = [
-
                     ".base-search-card__subtitle",
-
                     "h4.base-search-card__subtitle",
-
                     "h4"
                 ]
-
 
                 for selector in company_selectors:
 
@@ -585,8 +550,8 @@ class linkedin_scraper:
                             break
 
                     except Exception:
-                        continue
 
+                        continue
 
                 # ------------------------------------------------
                 # LOCATION
@@ -595,14 +560,10 @@ class linkedin_scraper:
                 location = ""
 
                 location_selectors = [
-
                     ".job-search-card__location",
-
                     ".base-search-card__metadata",
-
                     "span"
                 ]
-
 
                 for selector in location_selectors:
 
@@ -619,8 +580,8 @@ class linkedin_scraper:
                             break
 
                     except Exception:
-                        continue
 
+                        continue
 
                 # ------------------------------------------------
                 # JOB URL
@@ -629,14 +590,10 @@ class linkedin_scraper:
                 url = ""
 
                 url_selectors = [
-
                     "a.base-card__full-link",
-
                     "a[href*='/jobs/view/']",
-
                     "a[href*='/jobs/']"
                 ]
-
 
                 for selector in url_selectors:
 
@@ -655,8 +612,8 @@ class linkedin_scraper:
                             break
 
                     except Exception:
-                        continue
 
+                        continue
 
                 # ------------------------------------------------
                 # Clean URL
@@ -665,7 +622,6 @@ class linkedin_scraper:
                 if url:
 
                     url = url.split("?")[0]
-
 
                 # =================================================
                 # VALIDATION
@@ -680,7 +636,6 @@ class linkedin_scraper:
                 if not location:
                     location = "Location Not Available"
 
-
                 # ------------------------------------------------
                 # Job title filter
                 # ------------------------------------------------
@@ -690,10 +645,8 @@ class linkedin_scraper:
                     job_title_input
                 )
 
-
                 if not title_match:
                     continue
-
 
                 # ------------------------------------------------
                 # Location filter
@@ -704,33 +657,26 @@ class linkedin_scraper:
                     job_location
                 )
 
-
                 if not location_match:
                     continue
-
 
                 # ------------------------------------------------
                 # Add job
                 # ------------------------------------------------
 
-                jobs.append({
+                jobs.append(
+                    {
+                        "Company Name": company,
+                        "Job Title": title,
+                        "Location": location,
+                        "Website URL": url
+                    }
+                )
 
-                    "Company Name": company,
-
-                    "Job Title": title,
-
-                    "Location": location,
-
-                    "Website URL": url
-
-                })
-
-
-            except Exception:
+            except Exception as e:
 
                 # Skip malformed cards
                 continue
-
 
         # ========================================================
         # CREATE DATAFRAME
@@ -746,7 +692,6 @@ class linkedin_scraper:
             ]
         )
 
-
         # ========================================================
         # REMOVE DUPLICATES
         # ========================================================
@@ -755,6 +700,7 @@ class linkedin_scraper:
 
             if "Website URL" in df.columns:
 
+                # Remove duplicate URLs
                 df.drop_duplicates(
                     subset=["Website URL"],
                     inplace=True
@@ -766,12 +712,18 @@ class linkedin_scraper:
                     inplace=True
                 )
 
-
             df.reset_index(
                 drop=True,
                 inplace=True
             )
 
+        # ========================================================
+        # FINAL LIMIT
+        # ========================================================
+
+        df = df.head(
+            int(job_count)
+        ).copy()
 
         # ========================================================
         # DEBUG
@@ -782,9 +734,7 @@ class linkedin_scraper:
             len(df)
         )
 
-
         return df
-
 
     # ============================================================
     # SCRAPE JOB DESCRIPTIONS
@@ -805,7 +755,6 @@ class linkedin_scraper:
 
             return df
 
-
         # --------------------------------------------------------
         # Take requested number of jobs
         # --------------------------------------------------------
@@ -814,14 +763,11 @@ class linkedin_scraper:
             int(job_count)
         ).copy()
 
-
         website_urls = df[
             "Website URL"
         ].tolist()
 
-
         job_descriptions = []
-
 
         # ========================================================
         # PROCESS EACH JOB
@@ -829,10 +775,7 @@ class linkedin_scraper:
 
         for url in website_urls:
 
-            description = (
-                "Description Not Available"
-            )
-
+            description = "Description Not Available"
 
             # ----------------------------------------------------
             # Skip empty URL
@@ -846,7 +789,6 @@ class linkedin_scraper:
 
                 continue
 
-
             try:
 
                 # ------------------------------------------------
@@ -858,7 +800,6 @@ class linkedin_scraper:
                     url
                 )
 
-
                 if not success:
 
                     job_descriptions.append(
@@ -867,9 +808,7 @@ class linkedin_scraper:
 
                     continue
 
-
                 time.sleep(2)
-
 
                 # ------------------------------------------------
                 # Try multiple description selectors
@@ -877,18 +816,12 @@ class linkedin_scraper:
 
                 description_elements = []
 
-
                 selectors = [
-
                     ".show-more-less-html__markup",
-
                     ".description__text",
-
                     ".jobs-description__content",
-
                     "div[class*='description']"
                 ]
-
 
                 for selector in selectors:
 
@@ -909,7 +842,6 @@ class linkedin_scraper:
 
                         continue
 
-
                 # ------------------------------------------------
                 # Extract description
                 # ------------------------------------------------
@@ -922,15 +854,11 @@ class linkedin_scraper:
 
                         description = text
 
-
                 # ------------------------------------------------
                 # Try "Show more" if available
                 # ------------------------------------------------
 
-                if (
-                    description
-                    == "Description Not Available"
-                ):
+                if description == "Description Not Available":
 
                     try:
 
@@ -943,7 +871,6 @@ class linkedin_scraper:
                             "'show more')]"
                         )
 
-
                         if show_more_buttons:
 
                             driver.execute_script(
@@ -953,12 +880,12 @@ class linkedin_scraper:
 
                             time.sleep(1)
 
-
-                            description_elements = driver.find_elements(
-                                By.CSS_SELECTOR,
-                                ".show-more-less-html__markup"
+                            description_elements = (
+                                driver.find_elements(
+                                    By.CSS_SELECTOR,
+                                    ".show-more-less-html__markup"
+                                )
                             )
-
 
                             if description_elements:
 
@@ -976,36 +903,26 @@ class linkedin_scraper:
 
                         pass
 
-
             except Exception:
 
-                description = (
-                    "Description Not Available"
-                )
-
+                description = "Description Not Available"
 
             job_descriptions.append(
                 description
             )
 
-
         # ========================================================
         # ADD DESCRIPTION COLUMN
         # ========================================================
 
-        df["Job Description"] = (
-            job_descriptions
-        )
-
+        df["Job Description"] = job_descriptions
 
         df.reset_index(
             drop=True,
             inplace=True
         )
 
-
         return df
-
 
     # ============================================================
     # DISPLAY RESULTS
@@ -1017,7 +934,6 @@ class linkedin_scraper:
     ):
 
         add_vertical_space(1)
-
 
         # ========================================================
         # NO RESULTS
@@ -1039,7 +955,6 @@ class linkedin_scraper:
 
             return
 
-
         # ========================================================
         # DISPLAY JOBS
         # ========================================================
@@ -1057,7 +972,6 @@ class linkedin_scraper:
                 unsafe_allow_html=True
             )
 
-
             # ----------------------------------------------------
             # Company
             # ----------------------------------------------------
@@ -1066,7 +980,6 @@ class linkedin_scraper:
                 "Company Name :",
                 df_final.iloc[i]["Company Name"]
             )
-
 
             # ----------------------------------------------------
             # Job title
@@ -1077,7 +990,6 @@ class linkedin_scraper:
                 df_final.iloc[i]["Job Title"]
             )
 
-
             # ----------------------------------------------------
             # Location
             # ----------------------------------------------------
@@ -1087,7 +999,6 @@ class linkedin_scraper:
                 df_final.iloc[i]["Location"]
             )
 
-
             # ----------------------------------------------------
             # URL
             # ----------------------------------------------------
@@ -1096,7 +1007,6 @@ class linkedin_scraper:
                 "Website URL :",
                 df_final.iloc[i]["Website URL"]
             )
-
 
             # ----------------------------------------------------
             # Description
@@ -1112,9 +1022,7 @@ class linkedin_scraper:
                     ]
                 )
 
-
             add_vertical_space(3)
-
 
     # ============================================================
     # MAIN
@@ -1124,7 +1032,6 @@ class linkedin_scraper:
     def main():
 
         driver = None
-
 
         try:
 
@@ -1139,16 +1046,13 @@ class linkedin_scraper:
                 submit
             ) = linkedin_scraper.get_userinput()
 
-
             add_vertical_space(2)
-
 
             # ====================================================
             # SUBMIT
             # ====================================================
 
             if submit:
-
 
                 # ------------------------------------------------
                 # Validate inputs
@@ -1162,7 +1066,6 @@ class linkedin_scraper:
 
                     return
 
-
                 if not job_location.strip():
 
                     st.warning(
@@ -1170,7 +1073,6 @@ class linkedin_scraper:
                     )
 
                     return
-
 
                 # =================================================
                 # START DRIVER
@@ -1185,7 +1087,6 @@ class linkedin_scraper:
                         .webdriver_setup()
                     )
 
-
                 # =================================================
                 # BUILD SEARCH URL
                 # =================================================
@@ -1198,16 +1099,14 @@ class linkedin_scraper:
                     )
                 )
 
-
                 # ------------------------------------------------
-                # Show URL for debugging
+                # Show URL
                 # ------------------------------------------------
 
                 st.write(
                     "Search URL:",
                     link
                 )
-
 
                 # =================================================
                 # LOAD JOB LISTINGS
@@ -1223,7 +1122,6 @@ class linkedin_scraper:
                         job_count
                     )
 
-
                 # =================================================
                 # SCRAPE JOB DATA
                 # =================================================
@@ -1237,10 +1135,10 @@ class linkedin_scraper:
                         .scrap_company_data(
                             driver,
                             job_title_input,
-                            job_location
+                            job_location,
+                            job_count
                         )
                     )
-
 
                 # ------------------------------------------------
                 # Show dataframe before descriptions
@@ -1257,7 +1155,6 @@ class linkedin_scraper:
                         df,
                         use_container_width=True
                     )
-
 
                 # =================================================
                 # SCRAPE DESCRIPTIONS
@@ -1276,7 +1173,6 @@ class linkedin_scraper:
                         )
                     )
 
-
                 # =================================================
                 # DISPLAY
                 # =================================================
@@ -1285,13 +1181,11 @@ class linkedin_scraper:
                     df_final
                 )
 
-
         except Exception as e:
 
             st.error(
                 f"Job search error: {e}"
             )
-
 
         finally:
 
